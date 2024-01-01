@@ -10,6 +10,9 @@ app.use(helmet()); // help security
 app.use(compression()); // help save bandwidth
 
 // init DB
+require("./dbs/init.mongodb");
+const { checkOverLoad } = require("./helpers/check.connect");
+checkOverLoad();
 
 // init router
 app.get("/", (req, res, next) => {
