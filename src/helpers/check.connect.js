@@ -25,7 +25,7 @@ const checkOverLoad = () => {
     if (numConnection > maxConnections) {
       console.log(`Connection overload detected`);
     }
-  }, 5000); // Monitor every 5 seconds
+  }, 20000); // Monitor every 5 seconds
 };
 
 module.exports = {
