@@ -2,17 +2,11 @@
 
 const bcrypt = require("bcrypt");
 const shopModel = require("../models/shop.model");
-const crypto = require("crypto");
+const crypto = require("node:crypto");
 const KeyTokenService = require("./keyToken.service");
 const { createTokenPair } = require("../auth/authUtils");
 const { getInfoData } = require("../utils");
-
-const RoleShop = {
-  SHOP: "SHOP",
-  ADMIN: "000",
-  WRITER: "001",
-  EDITOR: "002",
-};
+const { RoleShop } = require("../constant/shop");
 
 class AccessService {
   static signUp = async ({ name, email, password }) => {
@@ -47,23 +41,24 @@ class AccessService {
         //     format: "pem",
         //   },
         // });
-        const privateKey = crypto.getRandomValues(64).toString("hex");
-        const publicKey = crypto.getRandomValues(64).toString("hex");
+        const privateKey = crypto.randomBytes(64).toString("hex");
+        const publicKey = crypto.randomBytes(64).toString("hex");
 
-        const publicKeyString = await KeyTokenService.createKeyToken({
+        const keyStore = await KeyTokenService.createKeyToken({
           userId: newShop._id,
           publicKey,
+          privateKey,
         });
 
-        if (!publicKeyString) {
+        if (!keyStore) {
           return {
             code: "xxxx",
-            message: "publicKeyString Error",
+            message: "keyStore Error",
           };
         }
-        const publicKeyObject = crypto.createPublicKey(publicKeyString);
+        // const publicKeyObject = crypto.createPublicKey(publicKeyString);
         // created token pair
-        const tokens = await createTokenPair({ userId: newShop._id, email }, publicKeyObject, privateKey);
+        const tokens = await createTokenPair({ userId: newShop._id, email }, publicKey, privateKey);
         console.log("Created Token Success ::", tokens);
         return {
           code: 201,
